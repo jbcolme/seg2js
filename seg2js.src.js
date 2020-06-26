@@ -249,6 +249,7 @@ export let readHeader = function(file, header)
 							}
 						}
 
+						// console.log(traceDescriptor);
 						resolve({
 							nsamples : nsamples,
 							dataFormat: dataFormat,
@@ -349,3 +350,166 @@ export let readTraceData = function(file, header, traceId, data)
 		reader.readAsArrayBuffer(blob);	
 	});
 }
+
+export let buildArraysToPlot = function(header, data)
+{
+	if (!header || !data) {
+		console.log("missing seg2file data");
+		return;
+	}
+
+	if (header.ntraces != data.length){
+		console.log("Dimensions of header and data do not match");
+		return;
+	}
+
+	let result = new Array(header.ntraces);
+	for (let nn = 0; nn < header.ntraces; nn++)
+	{
+		let ns = data[nn].length;
+		let dt = header.trace[nn].traceDescriptor['SAMPLE_INTERVAL'];
+		if (ns == 0 ) {
+			console.log("trace " + nn + " is empty. Omitting it.")
+			continue;
+		}
+
+		if (isNaN(dt)) {
+			console.log("Sampling interval of trace " + nn + " is not a number");
+			continue;
+		}
+		
+		let maxamp = 0;
+		for (var ii=0; ii<ns; ii++) {
+			maxamp = (Math.abs(data[nn][ii]) > maxamp) ? Math.abs(data[nn][ii]) : maxamp;
+		}
+
+		maxamp = maxamp == 0 ? 1 : maxamp;
+
+		let t = 0;
+		result[nn] = {x : [], y : []};
+		result[nn].x = new Array(ns);
+		result[nn].y = new Array(ns);
+		for (var ii=0; ii<ns; ii++)
+		{
+			result[nn].y[ii] = t;
+			result[nn].x[ii] = data[nn][ii]/(2*maxamp) + nn;
+			var temp = data[nn][ii];
+			// console.log(temp, temp/(2*maxamp), temp/(2*maxamp)+nn);
+			t += dt;
+		}
+	}
+
+	return result;
+}
+
+export let buildWiggleData = function(header)
+{
+	if (!header || !data) {
+		console.log("missing seg2file data");
+		return;
+	}
+
+	if (header.ntraces != data.length){
+		console.log("Dimensions of header and data do not match");
+		return;
+	}
+
+	let plotStruct = [];
+	for (let nn = 0; nn < header.ntraces; nn++)
+	{
+		let ns = seg2.traces[nn].data.length;
+		let dt = seg2.traces[nn].traceDescriptor()['SAMPLE_INTERVAL'];
+		if (ns == 0 ) {
+			console.log("trace " + nn + " is empty. Omitting it.")
+			continue;
+		}
+
+		if (isNaN(dt)) {
+			console.log("Sampling interval of trace " + nn + " is not a number");
+			continue;
+		}
+		
+		let maxamp = 0;
+		for (var ii=0; ii<ns; ii++) {
+			maxamp = (Math.abs(seg2.traces[nn].data[ii]) > maxamp) ? Math.abs(seg2.traces[nn].data[ii]) : maxamp;
+		}
+
+		maxamp = maxamp == 0 ? 1 : maxamp;
+
+		var ii = 0;
+
+		let getSingleWiggle = function(input, output, cc) {
+
+			if (cc > input.length) return output;
+
+			var valueToPlot = input[cc]/(2*maxamp) + nn;
+
+			if (output.length == 0) 
+			{
+				output.push(valueToPlot)
+			}
+			else
+			{
+				if (Math.sign(input[cc]) == Math.sign(input[cc-1])) {
+					output.push(valueToPlot)
+				}
+				else {
+					console.log(output);
+					return output;
+				}
+			}
+
+			cc++;
+		
+			return getSingleWiggle(input, output, cc);
+		}
+
+
+		do {
+			var wiggle = [];
+
+			wiggle = getSingleWiggle(seg2.traces[nn].data, wiggle, ii);
+
+			var time = new Array(wiggle.length);
+
+			for (var tt = 0; tt < wiggle.length; tt++) {
+				time[tt] = (ii+tt)*dt;
+			}
+
+			ii += wiggle.length;
+
+			if (wiggle.length == 1) {
+				console.log("single point");
+				continue;
+			}
+
+			if (wiggle[0] - nn > 0) {
+				plotStruct.push({
+					x: wiggle, 
+					y: time, 
+					fill: "toself",
+					mode: "lines",
+					fillcolor: 'black',
+					line: {
+						width: 2,
+						color: 'black'}
+				})
+			} else {
+				plotStruct.push({
+					x: wiggle, 
+					y: time,
+					mode: "lines",
+					line: {
+						width: 2,
+						color: 'black'}
+				})
+			}
+
+		} while (ii < ns)
+
+	}
+				
+	return plotStruct;
+}
+
+// rollup seg2js.src.js --file seg2js.bundle.js --format umd --name "seg2js"
