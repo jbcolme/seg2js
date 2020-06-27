@@ -346,14 +346,14 @@ var Seg2File = function() {
 						}
 						break;
 				}
-				console.log(data[0])
+
 				resolve();
 			}
 	
 			reader.readAsArrayBuffer(blob);	
 		});
 	};
-	
+
 	let buildArraysToPlot = function(header, data)
 	{
 		if (!header || !data) {
