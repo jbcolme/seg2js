@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 
 <head>
-<script type="text/javascript" src="../seg2js.src.js"></script>
+<script type="text/javascript" src="../seg2js.js"></script>
+<script type="text/javascript" src="example1.js"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 
@@ -9,7 +10,7 @@
 
 <input type="file" id="fileInput">
 <center>
-    <div id="myCanvas"></div>
+    <div id="seg2canvas"></div>
 </center>
 	
 <script>
@@ -28,54 +29,7 @@ window.onload = function() {
 
 	    if (file != undefined);
 	    {	
-			let seg2js = Seg2File();
-			let seg2headers = seg2js.createHeader();
-			let data = [];
-
-			async function getAllTraces(resolve)
-			{
-				data = new Array(seg2headers.ntraces);
-				for (var ii=0; ii<seg2headers.ntraces; ii++)
-				{	
-					data[ii] = new Array(seg2headers.trace[ii].nsamples);
-					await seg2js.readTraceData(file, seg2headers, ii, data[ii])
-				}
-
-				resolve();
-			}
-
-			seg2js.readHeader(file, seg2headers)
-			.then(() => {
-				return new Promise((resolve, reject) => {
-					getAllTraces(resolve)
-				})
-			})
-			.then(() => {
-				let data2plot = seg2js.buildArraysToPlot(seg2headers, data);
-				let plotStruct = [];
-                for (var ii = 0; ii < seg2headers.ntraces; ii++)
-                {
-                    plotStruct.push({
-                        x: data2plot[ii].x, 
-                        y: data2plot[ii].y, 
-                        fill: "toself", 
-                        line: {
-							color: '#000000',
-							fillcolor: '#000000',
-							width : 1
-						}
-                    })
-                }
-
-                var layout = {
-                    title: 'Seg2 plot example',
-                    showlegend: false,
-                    yaxis: {autorange: "reversed"}}
-
-                canvas = document.getElementById('myCanvas');
-	            Plotly.newPlot( canvas, plotStruct, layout,  );
-			})
-
+			readData(file);
 		}
 
     }

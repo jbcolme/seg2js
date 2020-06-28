@@ -1,8 +1,9 @@
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(global = global || self, factory(global.seg2js = {}));
+}(this, (function (exports) { 'use strict';
 
-'use strict';
-
-var Seg2File = function() {
-	
 	let createHeader = function()
 	{
 		return {
@@ -17,15 +18,15 @@ var Seg2File = function() {
 			trace: []
 		}
 	};
-	
-	
+
+
 	let readHeader = function(file, header)
 	{
 		if (!file || !header) {
 			console.log("wrong input");
 			return;
 		}
-	
+
 		header.ntraces = 0;
 		header.offsets = [];
 		header.versionNumber = 0;
@@ -35,15 +36,15 @@ var Seg2File = function() {
 		header.fileDescriptor = {};
 		header.sizeTracePointer = 0;
 		header.trace = [];
-	
+
 		let traceObject = {
 			nsamples: 0,
 			dataFormat: 0,
 			sizeof_tdb: 0,
 			sizeof_db: 0,
 			traceDescriptor: {}
-		}
-	
+		};
+
 		let readFirstPart = function(resolve, reject)
 		{
 			let reader = new FileReader();
@@ -64,7 +65,7 @@ var Seg2File = function() {
 					
 					header.ntraces = dv.getUint16(6,true);
 					header.trace = new Array(header.ntraces).fill(traceObject);
-	
+
 					if (header.ntraces > header.sizeTracePointer/4)
 						throw "The number of traces is too big for the trace pointer sub-block. The SEG-2 file has errors."
 					if (header.ntraces < 1)
@@ -81,17 +82,17 @@ var Seg2File = function() {
 						header.lt = dv.getUint8(12,true);
 					else
 						header.lt = dv.getUint16(12,true);
-	
+
 					resolve();
 				}
 				catch(err)
 				{
-					 reject(err);
+						reject(err);
 				}
-			}
+			};
 			reader.readAsArrayBuffer(blob);
-		}	
-	
+		};	
+
 		let readTracePointerSubblock = function(resolve, reject) 
 		{
 			let reader = new FileReader();
@@ -112,10 +113,10 @@ var Seg2File = function() {
 				{
 					reject(err);
 				}
-			}
+			};
 			reader.readAsArrayBuffer(blob);
-		}
-	
+		};
+
 		let readFileDescritor = function(resolve, reject)
 		{
 			let reader = new FileReader();
@@ -128,8 +129,8 @@ var Seg2File = function() {
 				if (key == "") return;
 				var value = sentence.substr(sentence.indexOf(' ')+1);
 				header.fileDescriptor[key] = value;
-			}
-	
+			};
+
 			reader.onload = function(e) 
 			{
 				try
@@ -138,10 +139,10 @@ var Seg2File = function() {
 					let dv = new DataView(buffer);
 					let nchars = header.offsets[0] - offset2;
 					let wholeSentenceBits = [];
-	
+
 					let getTerminateChar = (header.size_st == 1) ? 
 						(ii) => {return dv.getUint8(ii,true);} : (ii) => {return dv.getUint16(ii,true);};
-	
+
 					for (var ii=2; ii<nchars; ii++)
 					{
 						var termChar = getTerminateChar(ii);
@@ -155,17 +156,17 @@ var Seg2File = function() {
 							wholeSentenceBits.push(dv.getUint8(ii,true));
 						}
 					}
-	
+
 					resolve();
 				}
 				catch(err)
 				{
 					reject(err);
 				}
-			}	
+			};	
 			reader.readAsArrayBuffer(blob);
-		}
-	
+		};
+
 		let getTraceHeader = function(jj)
 		{
 			return new Promise((resolve, reject) =>
@@ -194,12 +195,12 @@ var Seg2File = function() {
 						let blob2 = file.slice(header.offsets[jj] + 32, 
 									header.offsets[jj] + 32 + sizeof_tdb);
 						let traceDescriptor = {};
-	
+
 						reader2.onload = function(e)
 						{
 							let buffer2 = e.target.result;
 							let dv2 = new DataView(buffer2);
-	
+
 							let getTerminateChar = (header.size_st == 1) ? 
 								(ii) => {return dv2.getUint8(ii,true);} : (ii) => {return dv2.getUint16(ii,true);};
 							
@@ -233,10 +234,10 @@ var Seg2File = function() {
 									
 								}
 								traceDescriptor[key] = value;
-							}
-	
+							};
+
 							let nchars =  sizeof_tdb - 32;
-			 
+				
 							let wholeSentenceBits = [];
 							for (var ii=2; ii<nchars; ii++)
 							{
@@ -251,7 +252,7 @@ var Seg2File = function() {
 									wholeSentenceBits.push(dv2.getUint8(ii,true));
 								}
 							}
-	
+
 							// console.log(traceDescriptor);
 							resolve({
 								nsamples : nsamples,
@@ -260,7 +261,7 @@ var Seg2File = function() {
 								sizeof_db: sizeof_db,
 								traceDescriptor: traceDescriptor
 							});
-						}
+						};
 						reader2.readAsArrayBuffer(blob2);
 						
 					}
@@ -268,11 +269,11 @@ var Seg2File = function() {
 					{
 						reject(err);
 					}
-				}
+				};
 				reader.readAsArrayBuffer(blob);
 			});
-		}
-	
+		};
+
 		async function readTracesHeaders(resolve, reject)
 		{
 			for (var ii=0; ii<header.ntraces; ii++)
@@ -281,10 +282,10 @@ var Seg2File = function() {
 					header.trace[ii] = Object.assign({}, traceHeader);
 				});
 			}
-	
+
 			resolve();
 		}
-	
+
 		return new Promise((resolve, reject) => 
 		{
 			readFirstPart(resolve, reject);
@@ -298,7 +299,7 @@ var Seg2File = function() {
 			});
 		}).then( () => {
 			return new Promise((resolve, reject) => {
-				readTracesHeaders(resolve, reject);
+				readTracesHeaders(resolve);
 			});
 		}).then( () => {
 			return;
@@ -307,7 +308,7 @@ var Seg2File = function() {
 			return(new Error(error));
 		})
 	};
-	
+
 	let readTraceData = function(file, header, traceId, data)
 	{
 		return new Promise((resolve, reject) => 
@@ -348,8 +349,8 @@ var Seg2File = function() {
 				}
 
 				resolve();
-			}
-	
+			};
+
 			reader.readAsArrayBuffer(blob);	
 		});
 	};
@@ -360,22 +361,22 @@ var Seg2File = function() {
 			console.log("missing seg2file data");
 			return;
 		}
-	
+
 		if (header.ntraces != data.length){
 			console.log("Dimensions of header and data do not match");
 			return;
 		}
-	
+
 		let result = new Array(header.ntraces);
 		for (let nn = 0; nn < header.ntraces; nn++)
 		{
 			let ns = data[nn].length;
 			let dt = header.trace[nn].traceDescriptor['SAMPLE_INTERVAL'];
 			if (ns == 0 ) {
-				console.log("trace " + nn + " is empty. Omitting it.")
+				console.log("trace " + nn + " is empty. Omitting it.");
 				continue;
 			}
-	
+
 			if (isNaN(dt)) {
 				console.log("Sampling interval of trace " + nn + " is not a number");
 				continue;
@@ -385,9 +386,9 @@ var Seg2File = function() {
 			for (var ii=0; ii<ns; ii++) {
 				maxamp = (Math.abs(data[nn][ii]) > maxamp) ? Math.abs(data[nn][ii]) : maxamp;
 			}
-	
+
 			maxamp = maxamp == 0 ? 1 : maxamp;
-	
+
 			let t = 0;
 			result[nn] = {x : [], y : []};
 			result[nn].x = new Array(ns);
@@ -397,36 +398,35 @@ var Seg2File = function() {
 				result[nn].y[ii] = t;
 				result[nn].x[ii] = data[nn][ii]/(2*maxamp) + nn;
 				var temp = data[nn][ii];
-				// console.log(temp, temp/(2*maxamp), temp/(2*maxamp)+nn);
 				t += dt;
 			}
 		}
-	
+
 		return result;
 	};
-	
+
 	let buildWiggleData = function(header)
 	{
 		if (!header || !data) {
 			console.log("missing seg2file data");
 			return;
 		}
-	
+
 		if (header.ntraces != data.length){
 			console.log("Dimensions of header and data do not match");
 			return;
 		}
-	
+
 		let plotStruct = [];
 		for (let nn = 0; nn < header.ntraces; nn++)
 		{
 			let ns = seg2.traces[nn].data.length;
 			let dt = seg2.traces[nn].traceDescriptor()['SAMPLE_INTERVAL'];
 			if (ns == 0 ) {
-				console.log("trace " + nn + " is empty. Omitting it.")
+				console.log("trace " + nn + " is empty. Omitting it.");
 				continue;
 			}
-	
+
 			if (isNaN(dt)) {
 				console.log("Sampling interval of trace " + nn + " is not a number");
 				continue;
@@ -436,56 +436,56 @@ var Seg2File = function() {
 			for (var ii=0; ii<ns; ii++) {
 				maxamp = (Math.abs(seg2.traces[nn].data[ii]) > maxamp) ? Math.abs(seg2.traces[nn].data[ii]) : maxamp;
 			}
-	
+
 			maxamp = maxamp == 0 ? 1 : maxamp;
-	
+
 			var ii = 0;
-	
+
 			let getSingleWiggle = function(input, output, cc) {
-	
+
 				if (cc > input.length) return output;
-	
+
 				var valueToPlot = input[cc]/(2*maxamp) + nn;
-	
+
 				if (output.length == 0) 
 				{
-					output.push(valueToPlot)
+					output.push(valueToPlot);
 				}
 				else
 				{
 					if (Math.sign(input[cc]) == Math.sign(input[cc-1])) {
-						output.push(valueToPlot)
+						output.push(valueToPlot);
 					}
 					else {
 						console.log(output);
 						return output;
 					}
 				}
-	
+
 				cc++;
 			
 				return getSingleWiggle(input, output, cc);
-			}
-	
-	
+			};
+
+
 			do {
 				var wiggle = [];
-	
+
 				wiggle = getSingleWiggle(seg2.traces[nn].data, wiggle, ii);
-	
+
 				var time = new Array(wiggle.length);
-	
+
 				for (var tt = 0; tt < wiggle.length; tt++) {
 					time[tt] = (ii+tt)*dt;
 				}
-	
+
 				ii += wiggle.length;
-	
+
 				if (wiggle.length == 1) {
 					console.log("single point");
 					continue;
 				}
-	
+
 				if (wiggle[0] - nn > 0) {
 					plotStruct.push({
 						x: wiggle, 
@@ -496,7 +496,7 @@ var Seg2File = function() {
 						line: {
 							width: 2,
 							color: 'black'}
-					})
+					});
 				} else {
 					plotStruct.push({
 						x: wiggle, 
@@ -505,22 +505,21 @@ var Seg2File = function() {
 						line: {
 							width: 2,
 							color: 'black'}
-					})
+					});
 				}
-	
+
 			} while (ii < ns)
-	
 		}
 					
 		return plotStruct;
 	};
 
-	return {
-		createHeader: createHeader,
-		readHeader: readHeader,    
-		readTraceData: readTraceData,
-		buildArraysToPlot: buildArraysToPlot,
-		buildWiggleData: buildWiggleData
-	};
-}
+	exports.buildArraysToPlot = buildArraysToPlot;
+	exports.buildWiggleData = buildWiggleData;
+	exports.createHeader = createHeader;
+	exports.readHeader = readHeader;
+	exports.readTraceData = readTraceData;
 
+	Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

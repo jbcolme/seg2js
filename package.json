@@ -1,0 +1,34 @@
+{
+  "name": "seg2js",
+  "version": "0.1.0",
+  "description": "Library to read SEG 2 data",
+  "main": "seg2.js",
+  "directories": {
+    "source": "src",
+    "example": "examples"
+  },
+  "dependencies": {
+    "rollup": "^2.10.0",
+    "terser": "^4.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jbcolme/seg2js.git"
+  },
+  "keywords": [
+    "SEG2",
+    "geophysics",
+    "seismic",
+    "gpr"
+  ],
+  "author": "Jose Colmenares",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/jbcolme/seg2js/issues"
+  },
+  "homepage": "https://github.com/jbcolme/seg2js#readme"
+}
