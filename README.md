@@ -1,6 +1,8 @@
 # seg2js
 Javascript reader of SEG 2 data
 
+![example of plotted SEG 2 data](https://github.com/jbcolme/seg2js/blob/master/images/banner.png?raw=true)
+
 This works intents to be a library to read SEG 2 data.
 The idea is to help develop tools in the web that read SEG 2 files. Since the data sets are sometimes pretty big, the scope is for the library to have a high performance.
 Currently only the file header and traces header are read when loading the file. This will allow in the future to filter what traces the user wants to display, contrary to loading the whole file in memory which could be prohibitive.
@@ -31,3 +33,8 @@ Some of this is already being developed, but have to be organized before pushing
 
     - [Simple case]
     - [HP]
+
+## Plots
+
+    -[Data methods]
+    -[Plotly]

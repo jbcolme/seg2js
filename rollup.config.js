@@ -1,11 +1,18 @@
+import { terser } from "rollup-plugin-terser";
+
+let terserOptions = {
+    compress: {defaults: true},
+    mangle: {}
+}
+
 export default {
     input: 'src/seg2js.src.js',
     output: {
-      file: 'seg2js.js',
+      file: 'seg2js.min.js',
       format: 'umd',
       name: 'seg2js',
       minifyInternalExports: true
-    }
+    },
+    plugins: [terser(terserOptions)]
   };
 
-// node_modules/terser/bin/terser --compress --mangle -- seg2js.js > seg2js.min.js

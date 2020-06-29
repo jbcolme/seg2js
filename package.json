@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "rollup": "^2.10.0",
+    "rollup-plugin-terser": "^6.1.0",
     "terser": "^4.8.0"
   },
   "devDependencies": {},
