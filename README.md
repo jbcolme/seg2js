@@ -14,9 +14,9 @@ Currently only the file header and traces header are read when loading the file.
 
 ## Installation
 
-You should download or checkout this repository. If you just want to *use* the library, you only need to include the minified version which you can find in the root directory ofthe project: seg2js.min.js
+You should download or checkout this repository. If you just want to *use* the library, you only need to include the minified version which you can find in the root directory of the project: seg2js.min.js
 
-If you want *develop* or debug the library, you may want to include in your project thesource file located in the **src** directory: seg2js.src.js.
+If you want *develop* or debug the library, you can edit the source file located in the **src** directory: seg2js.src.js. You *must* generate the minified version so the function is properly packaged as a module.
 
 To generate the minified file you can use rollup. You need to have node installed, then just do
 
@@ -27,7 +27,7 @@ To generate the minified file you can use rollup. You need to have node installe
 
 ### Get the handle of a file and read headers
 
-The first thing is to get a handle of a file. You can look at the example locatedinexamples/example1.html. Then you should read the headers. For that you must first create a headers object
+The first thing is to get a handle of a file. You can look at the example located in examples/example1.html. Then you should read the headers. For that you must first create a headers object
     
     let seg2headers = seg2js.createHeader();
 

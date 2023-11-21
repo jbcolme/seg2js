@@ -8,13 +8,16 @@
     "example": "examples"
   },
   "dependencies": {
+    "http-server": "^14.1.1",
     "rollup": "^2.10.0",
     "rollup-plugin-terser": "^6.1.0",
-    "terser": "^4.8.1"
+    "terser": "^4.8.1",
+    "http-server": "^14.1.1"
   },
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "rollup": "rollup -c",
+    "serve": "http-server"
   },
   "repository": {
     "type": "git",
