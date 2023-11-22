@@ -23,6 +23,10 @@ To generate the minified file you can use rollup. You need to have node installe
     npm install
     rollup -c
 
+To run the example you can use http-server
+
+    npm run serve
+
 ## Usage
 
 ### Get the handle of a file and read headers
@@ -49,6 +53,7 @@ after which you can read the readers using the method `readHeader` which returns
         })
     })
  
+yout must enable CORS in your server
 
  ## API
 

@@ -1,9 +1,10 @@
-
+var seg2js = (function (exports) {
 	'use strict';
 	
 	
-  export let createHeader = function()
-		{
+  //   export let createHeader = function()
+	function createHeader()
+	{
 		return {
 			ntraces: 0,
 			offsets: [],
@@ -18,8 +19,9 @@
 	};
 	
 	
-  export let readHeader = function(file, header)
-		{
+  //   export let readHeader = function(file, header)
+	function readHeader(file, header)
+	{
 		if (!file || !header) {
 			console.log("wrong input");
 			return;
@@ -323,8 +325,9 @@
 		})
 	};
 	
-  export let readTraceData = function(file, header, traceId, data)
-		{
+  //   export let readTraceData = function(file, header, traceId, data)
+	function readTraceData(file, header, traceId, data)
+	{
 		return new Promise((resolve, reject) => 
 		{
 			let reader = new FileReader();
@@ -369,8 +372,9 @@
 		});
 	};
 	
-  export let buildArraysToPlot = function(header, data)
-		{
+  //   export let buildArraysToPlot = function(header, data)
+	function buildArraysToPlot(header, data)
+	{
 		if (!header || !data) {
 			console.log("missing seg2file data");
 			return;
@@ -432,8 +436,9 @@
 		return result;
 	};
 	
-  export let buildWiggleData = function(header)
-		{
+  //   export let buildWiggleData = function(header)
+	function buildWiggleData(header)
+	{
 		if (!header || !data) {
 			console.log("missing seg2file data");
 			return;
@@ -541,4 +546,14 @@
 		return plotStruct;
 	};
   
-
+	exports.createHeader = createHeader;
+	exports.readHeader = readHeader;
+	exports.readTraceData = readTraceData;
+	exports.buildArraysToPlot = buildArraysToPlot;
+	exports.buildWiggleData = buildWiggleData;
+  
+	Object.defineProperty(exports, '__esModule', { value: true });
+	
+	return exports;
+  
+  }({}));
